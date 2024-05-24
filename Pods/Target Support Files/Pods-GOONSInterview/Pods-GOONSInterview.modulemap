@@ -1,0 +1,6 @@
+framework module Pods_GOONSInterview {
+  umbrella header "Pods-GOONSInterview-umbrella.h"
+
+  export *
+  module * { export * }
+}
