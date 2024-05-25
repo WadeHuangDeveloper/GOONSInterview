@@ -16,6 +16,7 @@ class RepositoryListViewController: UIViewController {
     private var refreshControl = UIRefreshControl()
     private var searchBar = UISearchBar()
     private var repositoryTableView = UITableView()
+    private var tapGesture = UITapGestureRecognizer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,12 +39,6 @@ class RepositoryListViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        
-        view.endEditing(true)
-    }
-    
     private func setupUI() {
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didRefresh), for: .valueChanged)
@@ -54,7 +49,7 @@ class RepositoryListViewController: UIViewController {
         searchBar.placeholder = "請輸入關鍵字搜尋"
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapTableView))
+        tapGesture.addTarget(self, action: #selector(didTapGesture))
         repositoryTableView.addGestureRecognizer(tapGesture)
         repositoryTableView.refreshControl = refreshControl
         repositoryTableView.tableHeaderView = searchBar
@@ -82,10 +77,9 @@ class RepositoryListViewController: UIViewController {
         viewModel.$itemModels
             .receive(on: DispatchQueue.main)
             .sink { models in
-                if models.count > 0 && self.refreshControl.isRefreshing {
-                    self.refreshControl.endRefreshing()
-                }
                 self.repositoryTableView.reloadData()
+                self.refreshControl.endRefreshing()
+                self.tapGesture.isEnabled = models.count == 0
             }.store(in: &subscriptions)
         
         viewModel.$errorMessage
@@ -93,23 +87,24 @@ class RepositoryListViewController: UIViewController {
             .sink { error in
                 guard let error = error else { return }
                 self.showAlert(message: error)
+                self.refreshControl.endRefreshing()
             }.store(in: &subscriptions)
     }
     
-    @objc private func didTapTableView() {
-        view.endEditing(true)
-    }
-    
     @objc private func didRefresh() {
+        view.endEditing(true)
+        
         viewModel.itemModels.removeAll()
         
         guard let text = searchBar.text else { return }
         viewModel.requestAPI(text)
     }
     
+    @objc private func didTapGesture(_ sender: UITapGestureRecognizer) {
+        view.endEditing(true)
+    }
+    
     private func showAlert(message: String = "") {
-        refreshControl.endRefreshing()
-        
         let alertController = UIAlertController(title: "Oops!", message: message, preferredStyle: .alert)
         let okAlertAction = UIAlertAction(title: "Ok", style: .default)
         alertController.addAction(okAlertAction)
@@ -150,4 +145,6 @@ extension RepositoryListViewController: UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         coordinator?.request(.toDetailView(viewModel.itemModels[indexPath.row]))
     }
+    
+    
 }

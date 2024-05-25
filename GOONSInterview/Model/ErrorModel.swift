@@ -6,12 +6,12 @@
 //
 
 import Foundation
+import Alamofire
 
 enum ErrorModel: Error {
     case InvalidSearchText
     case InvalidURL
 }
-
 
 extension ErrorModel {
     public var description: String {

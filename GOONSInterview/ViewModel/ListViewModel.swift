@@ -26,7 +26,7 @@ class ListViewModel {
                 
                 print(url)
                 
-                let request = AF.request(url, method: .get) { $0.timeoutInterval = 3.0 }
+                let request = AF.request(url, method: .get) { $0.timeoutInterval = 5.0 }
                 request.responseDecodable { [weak self] (response: DataResponse<RepositoryJsonModel, AFError>) in
                     switch response.result {
                     case .success(let model):
@@ -34,13 +34,19 @@ class ListViewModel {
                         self?.errorMessage = nil
                         
                     case .failure(let error):
-                        self?.errorMessage = error.localizedDescription
                         self?.itemModels.removeAll()
+                        self?.errorMessage = error.localizedDescription
                     }
                 }
             } catch {
-                self.errorMessage = error.localizedDescription
                 self.itemModels.removeAll()
+                if let error = error as? ErrorModel {
+                    errorMessage = error.description
+                } else if let error = error as? AFError {
+                    errorMessage = error.errorDescription
+                } else {
+                    errorMessage = error.localizedDescription
+                }
             }
         }
     }

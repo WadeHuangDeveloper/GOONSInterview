@@ -40,7 +40,7 @@ class RepositoryDetailViewController: UIViewController {
         fullNameLabel.textAlignment = .center
         fullNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        languageLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        languageLabel.font = .systemFont(ofSize: 16, weight: .bold)
         languageLabel.translatesAutoresizingMaskIntoConstraints = false
         
         starsLabel.font = .systemFont(ofSize: 14, weight: .regular)
@@ -99,7 +99,7 @@ class RepositoryDetailViewController: UIViewController {
                 self.iconImageView.sd_setImage(with: URL(string: model.owner.icon))
                 self.loginLabel.text = model.owner.login
                 self.fullNameLabel.text = model.repositoryName
-                self.languageLabel.text = "Written in \(model.programLanguage)"
+                self.languageLabel.text = "Written in \(model.programLanguage ?? "unknown")"
                 self.starsLabel.text = "\(model.stars) stars"
                 self.watchersLabel.text = "\(model.watchers) watchers"
                 self.forksLabel.text = "\(model.forks) forks"

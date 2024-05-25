@@ -14,12 +14,17 @@ struct OwnerJsonModel: Codable {
     
     enum CodingKeys: String, CodingKey {
         case icon = "avatar_url"
-        case login
+        case login = "login"
     }
     
     init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.icon = try container.decode(String.self, forKey: .icon)
-        self.login = try container.decode(String.self, forKey: .login)
+        do {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.icon = try container.decode(String.self, forKey: .icon)
+            self.login = try container.decode(String.self, forKey: .login)
+        } catch {
+            print(error)
+            throw error
+        }
     }
 }
