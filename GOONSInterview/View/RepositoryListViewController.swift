@@ -37,6 +37,7 @@ class RepositoryListViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.backButtonTitle = "Back"
     }
     
     private func setupUI() {
